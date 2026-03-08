@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "node-rcheevos": "^1.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.5"
+  }
+}
