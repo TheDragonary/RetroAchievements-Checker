@@ -11,12 +11,15 @@ This is a tool to match all ROM files with their corresponding RetroAchievements
 - Game Boy Advance
 - Nintendo 64
 - Nintendo DS
+- Nintendo DSi
+- Nintendo GameCube
+- Nintendo Wii
 - Sega Genesis / Mega Drive
 - PlayStation
 - PlayStation 2
 - PlayStation Portable
 
-(PlayStation .chd files and GameCube/Wii .rvz files will not work)
+(GameCube/Wii .rvz files will not work)
 
 ## Getting Started
 Clone the repo

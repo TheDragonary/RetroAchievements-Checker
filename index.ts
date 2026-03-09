@@ -1,9 +1,9 @@
-import pkg from "node-rcheevos";
-const { rhash, ConsoleId } = pkg;
+import { execFile } from "child_process";
+import { promisify } from "util";
 import * as dotenv from "dotenv";
-dotenv.config({ quiet: true });
 import path from "path";
 import fs from "fs";
+dotenv.config({ quiet: true });
 
 const API_KEY = process.env.RA_API_KEY;
 
@@ -21,36 +21,40 @@ interface Game {
     Hashes: string[];
 }
 
-const consoleMap: Record<string, pkg.ConsoleIdValue> = {
-    NES: ConsoleId.NINTENDO,
-    FDS: ConsoleId.FAMICOM_DISK_SYSTEM,
-    SNES: ConsoleId.SUPER_NINTENDO,
-    GB: ConsoleId.GAMEBOY,
-    GBC: ConsoleId.GAMEBOY_COLOR,
-    GBA: ConsoleId.GAMEBOY_ADVANCE,
-    N64: ConsoleId.NINTENDO_64,
-    NDS: ConsoleId.NINTENDO_DS,
-    GENESIS: ConsoleId.MEGA_DRIVE,
-    MD: ConsoleId.MEGA_DRIVE,
-    PSX: ConsoleId.PLAYSTATION,
-    PS1: ConsoleId.PLAYSTATION,
-    PS2: ConsoleId.PLAYSTATION_2,
-    PSP: ConsoleId.PSP,
-    GC: ConsoleId.GAMECUBE,
-    WII: ConsoleId.WII,
+const consoleMap: Record<string, number> = {
+    "NES": 7,
+    "FDS": 81,
+    "SNES": 3,
+    "GB": 4,
+    "GBC": 6,
+    "GBA": 5,
+    "N64": 2,
+    "NDS": 18,
+    "DSI": 78,
+    "3DS": 62,
+    "GENESIS": 1,
+    "MD": 1,
+    "PSX": 12,
+    "PS1": 12,
+    "PS2": 21,
+    "PSP": 41,
+    "GC": 16,
+    "WII": 19,
+    "WII U": 20,
 };
 
-const extensionMap: Record<string, pkg.ConsoleIdValue> = {
-    ".nes": ConsoleId.NINTENDO,
-    ".fds": ConsoleId.FAMICOM_DISK_SYSTEM,
-    ".sfc": ConsoleId.SUPER_NINTENDO,
-    ".smc": ConsoleId.SUPER_NINTENDO,
-    ".gb": ConsoleId.GAMEBOY,
-    ".gbc": ConsoleId.GAMEBOY_COLOR,
-    ".gba": ConsoleId.GAMEBOY_ADVANCE,
-    ".z64": ConsoleId.NINTENDO_64,
-    ".nds": ConsoleId.NINTENDO_DS,
-    ".md": ConsoleId.MEGA_DRIVE,
+const extensionMap: Record<string, number> = {
+    ".nes": 7,
+    ".fds": 81,
+    ".sfc": 3,
+    ".smc": 3,
+    ".gb": 4,
+    ".gbc": 6,
+    ".gba": 5,
+    ".z64": 2,
+    ".nds": 18,
+    ".3ds": 61,
+    ".md": 1,
 };
 
 const ignoreSet: Set<string> = new Set([
@@ -70,6 +74,22 @@ const extensionsToIgnore: string[] = [
     ".cue",
     ".m3u",
 ];
+
+const execFileAsync = promisify(execFile);
+
+const HASHER = path.resolve(
+    "./bin",
+    process.platform === "win32" ? "RAHasher.exe" : "RAHasher",
+);
+
+async function raHash(consoleId: number, file: string): Promise<string> {
+    const { stdout } = await execFileAsync(HASHER, [
+        consoleId.toString(),
+        file,
+    ]);
+
+    return stdout.trim().toLowerCase();
+}
 
 async function buildHashDatabase(consoleId: number) {
     const games: Game[] = await fetch(
@@ -109,7 +129,7 @@ function scanRomFolder(dir: string): string[] {
     return files;
 }
 
-function detectConsole(file: string): pkg.ConsoleIdValue | null {
+function detectConsole(file: string): number | null {
     const folder = path
         .relative("./ROMs", file)
         .split(path.sep)[0]
@@ -147,11 +167,11 @@ for (const file of romFiles) {
 
     let hash;
     try {
-        hash = rhash(consoleId, file);
+        hash = await raHash(consoleId, file);
     } catch (err) {
         if (err instanceof Error) {
             console.log(
-                `❌ ${folder.padEnd(6)} ${path.basename(file)} -> hashing failed (${err.message})`,
+                `❌ ${folder.padEnd(6)} ${path.basename(file)} -> ${err.message}`,
             );
         }
     }
