@@ -11,15 +11,11 @@ It compares ROM hashes with the official RetroAchievements database to identify 
 - Automatically detects system from file extension
 
 ## Supported Systems
-- NES
+- NES / Famicom Disk System
 - SNES
-- Famicom Disk System
-- Game Boy
-- Game Boy Color
-- Game Boy Advance
 - Nintendo 64
-- Nintendo DS
-- Nintendo DSi
+- Game Boy / Color / Advance
+- Nintendo DS / DSi
 - Nintendo GameCube
 - Nintendo Wii
 - Sega Genesis / Mega Drive
@@ -38,6 +34,7 @@ The script will:
 - Calculate their hashes
 - Query the RetroAchievements API
 - Report whether each ROM matches a supported game
+- Output total supported games
 
 Example output:
 

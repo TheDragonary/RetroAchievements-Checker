@@ -27,22 +27,26 @@ const consoleMap: Record<string, number> = {
     NES: 7,
     FDS: 81,
     SNES: 3,
+    N64: 2,
     GB: 4,
     GBC: 6,
     GBA: 5,
-    N64: 2,
     NDS: 18,
     DSI: 78,
+    GC: 16,
+    WII: 19,
     "3DS": 62,
+    "WII U": 20,
     GENESIS: 1,
     MD: 1,
     PSX: 12,
     PS1: 12,
     PS2: 21,
     PSP: 41,
-    GC: 16,
-    WII: 19,
-    "WII U": 20,
+};
+
+const consoleFallbacks: Record<number, number[]> = {
+    81: [7], // FDS -> NES
 };
 
 const extensionMap: Record<string, number> = {
@@ -170,6 +174,9 @@ async function getHashDatabase(consoleId: number) {
 const hashDatabases = new Map<number, Map<string, Game>>();
 const romFiles = scanRomFolder("./ROMs");
 
+let supported = 0;
+let total = 0;
+
 for (const file of romFiles) {
     const folder = path
         .relative("./ROMs", file)
@@ -185,6 +192,8 @@ for (const file of romFiles) {
         continue;
     }
 
+    total++;
+    
     let hash;
     try {
         if (ext === ".rvz") {
@@ -202,10 +211,23 @@ for (const file of romFiles) {
 
     if (!hash) continue;
 
+    let game: Game | undefined;
     const db = await getHashDatabase(consoleId);
-    const game = db.get(hash);
+    game = db.get(hash);
+
+    if (!game && consoleFallbacks[consoleId]) {
+        for (const fallback of consoleFallbacks[consoleId]) {
+            const fallbackDb = await getHashDatabase(fallback);
+            game = fallbackDb.get(hash);
+            if (game) break;
+        }
+    }
+
+    if (game) supported++;
 
     console.log(
         `${game?.Title ? "✅" : "❌"} ${folder.padEnd(8)} ${path.basename(file)} -> ${game?.Title ?? "Not supported"}`,
     );
 }
+
+console.log(`Supported: ${supported} / ${total}`);
