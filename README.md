@@ -1,6 +1,15 @@
 # RetroAchievements Checker
+Scan your ROM library and identify which games support RetroAchievements.
 
-This is a tool to match all ROM files with their corresponding RetroAchievements games. It uses the RetroAchievements API to fetch game information and then compares the file hashes with the game hashes stored in the database.
+A tool that scans your ROM library and matches each file with its corresponding RetroAchievements entry using the RetroAchievements API.
+
+It compares ROM hashes with the official RetroAchievements database to identify supported games.
+
+## Features
+- Matches ROM files to RetroAchievements supported games
+- Uses official RetroAchievements hash database
+- Supports compressed and disc formats (CHD, RVZ)
+- Automatically detects system from file extension
 
 ## Supported Systems
 - NES
@@ -19,7 +28,23 @@ This is a tool to match all ROM files with their corresponding RetroAchievements
 - PlayStation 2
 - PlayStation Portable
 
-(GameCube/Wii .rvz files will not work)
+CHD files are supported natively.
+
+RVZ files are supported by temporarily converting them to ISO format in order to calculate the correct hash. The temporary file is deleted after processing. 
+
+## Output
+The script will:
+
+- Scan all ROM files in the ROM directory
+- Calculate their hashes
+- Query the RetroAchievements API
+- Report whether each ROM matches a supported game
+
+Example output:
+
+✅ NES      Super Mario Bros. (World).nes -> Super Mario Bros.
+✅ SNES     Chrono Trigger (USA).sfc -> Chrono Trigger
+❌ SNES     Super Mario World (Europe).sfc -> Not supported
 
 ## Getting Started
 Clone the repo
@@ -37,7 +62,24 @@ Create a `.env` file in the root directory and add your RetroAchievements API ke
 RA_API_KEY=your_api_key
 ```
 
-Move your ROMs folder into this directory. The script will scan the folder for ROM files. The script will try its best to match each ROM file extension to a system, but to make things easier, make sure all system subfolder names match exactly with the entries in `consoleMap`.
+Place your ROMs inside a `ROMs` directory in the project root. Folder names must match the entries in `consoleMap`.
+
+Example:
+```
+ROMs/
+    NES/
+        Super Mario Bros. (World).nes
+    SNES/
+        Chrono Trigger (USA).sfc
+    NDS/
+        New Super Mario Bros. (Europe) (En,Fr,De,Es,It).nds
+    GC/
+        Animal Crossing (USA, Canada).rvz
+    PSX/
+        Final Fantasy VII (USA) (Disc 1).chd
+```
+
+Run the script:
 ```
 node index.ts
 ```

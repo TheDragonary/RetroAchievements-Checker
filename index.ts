@@ -1,8 +1,10 @@
+import dolphinTool, { ContainerFormat } from "dolphin-tool";
 import { execFile } from "child_process";
 import { promisify } from "util";
 import * as dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
+import os from "os";
 dotenv.config({ quiet: true });
 
 const API_KEY = process.env.RA_API_KEY;
@@ -22,24 +24,24 @@ interface Game {
 }
 
 const consoleMap: Record<string, number> = {
-    "NES": 7,
-    "FDS": 81,
-    "SNES": 3,
-    "GB": 4,
-    "GBC": 6,
-    "GBA": 5,
-    "N64": 2,
-    "NDS": 18,
-    "DSI": 78,
+    NES: 7,
+    FDS: 81,
+    SNES: 3,
+    GB: 4,
+    GBC: 6,
+    GBA: 5,
+    N64: 2,
+    NDS: 18,
+    DSI: 78,
     "3DS": 62,
-    "GENESIS": 1,
-    "MD": 1,
-    "PSX": 12,
-    "PS1": 12,
-    "PS2": 21,
-    "PSP": 41,
-    "GC": 16,
-    "WII": 19,
+    GENESIS: 1,
+    MD: 1,
+    PSX: 12,
+    PS1: 12,
+    PS2: 21,
+    PSP: 41,
+    GC: 16,
+    WII: 19,
     "WII U": 20,
 };
 
@@ -91,9 +93,25 @@ async function raHash(consoleId: number, file: string): Promise<string> {
     return stdout.trim().toLowerCase();
 }
 
+async function hashRvz(consoleId: number, file: string) {
+    const tempIso = path.join(os.tmpdir(), `${path.basename(file)}.iso`);
+
+    await dolphinTool.convert({
+        inputFilename: file,
+        outputFilename: tempIso,
+        containerFormat: ContainerFormat.ISO,
+    });
+
+    const hash = await raHash(consoleId, tempIso);
+
+    fs.unlinkSync(tempIso);
+
+    return hash;
+}
+
 async function buildHashDatabase(consoleId: number) {
     const games: Game[] = await fetch(
-        `https://retroachievements.org/API/API_GetGameList.php?y=${API_KEY}&i=${consoleId}&h=1&f=1`,
+        `https://retroachievements.org/API/API_GetGameList.php?y=${API_KEY}&i=${consoleId}&h=1`,
     ).then((r) => r.json());
 
     const map = new Map<string, Game>();
@@ -158,6 +176,8 @@ for (const file of romFiles) {
         .split(path.sep)[0]
         .toUpperCase();
 
+    const ext = path.extname(file).toLowerCase();
+
     const consoleId = detectConsole(file);
 
     if (!consoleId) {
@@ -167,7 +187,11 @@ for (const file of romFiles) {
 
     let hash;
     try {
-        hash = await raHash(consoleId, file);
+        if (ext === ".rvz") {
+            hash = await hashRvz(consoleId, file);
+        } else {
+            hash = await raHash(consoleId, file);
+        }
     } catch (err) {
         if (err instanceof Error) {
             console.log(
