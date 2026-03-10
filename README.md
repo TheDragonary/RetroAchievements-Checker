@@ -1,5 +1,4 @@
 # RetroAchievements Checker
-Scan your ROM library and identify which games support RetroAchievements.
 
 A tool that scans your ROM library and matches each file with its corresponding RetroAchievements entry using the RetroAchievements API.
 
@@ -35,7 +34,7 @@ RVZ files are supported by temporarily converting them to ISO format in order to
 ## Output
 The script will:
 
-- Scan all ROM files in the ROM directory
+- Scan all ROM files in the ROMs directory
 - Calculate their hashes
 - Query the RetroAchievements API
 - Report whether each ROM matches a supported game
@@ -43,7 +42,9 @@ The script will:
 Example output:
 
 ✅ NES      Super Mario Bros. (World).nes -> Super Mario Bros.
+
 ✅ SNES     Chrono Trigger (USA).sfc -> Chrono Trigger
+
 ❌ SNES     Super Mario World (Europe).sfc -> Not supported
 
 ## Getting Started
@@ -62,9 +63,7 @@ Create a `.env` file in the root directory and add your RetroAchievements API ke
 RA_API_KEY=your_api_key
 ```
 
-Place your ROMs inside a `ROMs` directory in the project root. Folder names must match the entries in `consoleMap`.
-
-Example:
+Place your ROMs inside a `ROMs` directory in the project root. Folder names must match the entries in `consoleMap`. Example:
 ```
 ROMs/
     NES/
