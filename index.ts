@@ -63,7 +63,7 @@ const extensionMap: Record<string, number> = {
     ".gba": 5,
     ".z64": 2,
     ".nds": 18,
-    ".3ds": 61,
+    ".3ds": 62,
     ".md": 1,
 };
 
@@ -195,10 +195,8 @@ function scanRomFolder(dir: string): string[] {
 }
 
 function detectConsole(file: string): number | null {
-    const folder = path
-        .relative("./ROMs", file)
-        .split(path.sep)[0]
-        .toUpperCase();
+    const relative = getRelative(file);
+    const folder = relative.split("/")[0].toUpperCase();
 
     if (consoleMap[folder]) return consoleMap[folder];
     const ext = path.extname(file).toLowerCase();
@@ -206,8 +204,19 @@ function detectConsole(file: string): number | null {
     return null;
 }
 
+function resolveUserPath(p: string) {
+    return p.startsWith("~") ? path.join(os.homedir(), p.slice(1)) : p;
+}
+
+function getRelative(file: string) {
+    return path.relative(romFolder, file).replace(/\\/g, "/");
+}
+
+const inputPath = process.argv[2];
+const romFolder = path.resolve(resolveUserPath(inputPath || "./ROMs"));
+
 await buildAllHashDatabases();
-const romFiles = scanRomFolder("./ROMs");
+const romFiles = scanRomFolder(romFolder);
 
 let supportedGames = new Map<string, string>();
 let unsupportedGames = new Map<string, string>();
@@ -224,11 +233,8 @@ if (fs.existsSync("./cache/unsupported_games.json")) {
 }
 
 for (const file of romFiles) {
-    const folder = path
-        .relative("./ROMs", file)
-        .split(path.sep)[0]
-        .toUpperCase();
-
+    const relative = getRelative(file);
+    const folder = relative.split("/")[0].toUpperCase();
     const ext = path.extname(file).toLowerCase();
 
     const consoleId = detectConsole(file);
@@ -238,7 +244,7 @@ for (const file of romFiles) {
         continue;
     }
 
-    let hash = supportedGames.has(file) ? supportedGames.get(file) : unsupportedGames.has(file) ? unsupportedGames.get(file) : null;
+    let hash = supportedGames.get(relative) ?? unsupportedGames.get(relative) ?? null;
 
     if (!hash) {
         try {
@@ -264,9 +270,9 @@ for (const file of romFiles) {
 
     if (game) {
         supported++;
-        supportedGames.set(file, hash);
+        supportedGames.set(relative, hash);
     } else {
-        unsupportedGames.set(file, hash);
+        unsupportedGames.set(relative, hash);
     }
 
     console.log(

@@ -2,13 +2,16 @@
 
 A tool that scans your ROM library and matches each file with its corresponding RetroAchievements entry using the RetroAchievements API.
 
-It compares ROM hashes with the official RetroAchievements database to identify supported games.
+It calculates ROM hashes and compares them against the official RetroAchievements hash database to identify which games in your collection support achievements.
 
 ## Features
-- Matches ROM files to RetroAchievements supported games
-- Uses official RetroAchievements hash database
+- Scans a ROM library and detects supported RetroAchievements games
+- Uses the official RetroAchievements hash database
 - Supports compressed and disc formats (CHD, RVZ)
-- Automatically detects system from file extension
+- Automatically detects console from folder name or file extension
+- Caches RetroAchievements console and game data
+- Caches previously calculated ROM hashes for faster rescans
+- Generates lists of supported and unsupported games
 
 ## Supported Systems
 - NES / Famicom Disk System
@@ -25,24 +28,25 @@ It compares ROM hashes with the official RetroAchievements database to identify 
 
 CHD files are supported natively.
 
-RVZ files are supported by temporarily converting them to ISO format in order to calculate the correct hash. The temporary file is deleted after processing. 
+RVZ files are temporarily converted to ISO in order to compute the correct RetroAchievements hash. The temporary ISO file is automatically deleted after hashing. 
 
 ## Output
 The script will:
-
-- Scan all ROM files in the ROMs directory
-- Calculate their hashes
-- Query the RetroAchievements API
-- Report whether each ROM matches a supported game
-- Output total supported games
+- Scan all ROM files inside the ROMs directory
+- Detect the console for each ROM
+- Calculate the RetroAchievements hash
+- Compare the hash against the official database
+- Cache API responses locally
+- Cache calculated ROM hashes
+- Output supported and unsupported games
+- Display total supported games
 
 Example output:
-
+```
 ✅ NES      Super Mario Bros. (World).nes -> Super Mario Bros.
-
 ✅ SNES     Chrono Trigger (USA).sfc -> Chrono Trigger
-
 ❌ SNES     Super Mario World (Europe).sfc -> Not supported
+```
 
 ## Getting Started
 Clone the repo
@@ -60,7 +64,7 @@ Create a `.env` file in the root directory and add your RetroAchievements API ke
 RA_API_KEY=your_api_key
 ```
 
-Place your ROMs inside a `ROMs` directory in the project root. Folder names must match the entries in `consoleMap`. Example:
+Place your ROMs inside a folder. Folder names should match the entries in `consoleMap`. Example structure:
 ```
 ROMs/
     NES/
@@ -75,7 +79,7 @@ ROMs/
         Final Fantasy VII (USA) (Disc 1).chd
 ```
 
-Run the script:
+Run the script and make sure to specify the path to your ROMs folder. Example:
 ```
-node index.ts
+node index.ts ./ROMs
 ```
