@@ -1,3 +1,6 @@
 node_modules
 .env
 ROMs
+cache
+supported_games.txt
+unsupported_games.txt

@@ -141,12 +141,26 @@ async function fetchGamesForConsole(consoleId: number, retries = 3, delayMs = 10
 }
 
 async function buildAllHashDatabases() {
-    const consoles = await getConsoleList();
+    if (!fs.existsSync("./cache")) fs.mkdirSync("./cache");
+
+    let consoles: Console[];
+    if (!fs.existsSync("./cache/consoles.json")) {
+        consoles = await getConsoleList();
+        fs.writeFileSync("./cache/consoles.json", JSON.stringify(consoles, null, 2));
+    } else {
+        consoles = JSON.parse(fs.readFileSync("./cache/consoles.json", "utf8"));
+    }
 
     for (const c of consoles) {
         console.log(`Loading ${c.Name}...`);
         
-        const games = await fetchGamesForConsole(c.ID);
+        let games: Game[];
+        if (!fs.existsSync(`./cache/${c.ID}.json`)) {
+            games = await fetchGamesForConsole(c.ID);
+            fs.writeFileSync(`./cache/${c.ID}.json`, JSON.stringify(games, null, 2));
+        } else {
+            games = JSON.parse(fs.readFileSync(`./cache/${c.ID}.json`, "utf8"));
+        }
 
         for (const game of games) {
             for (const hash of game.Hashes ?? []) {
@@ -195,8 +209,19 @@ function detectConsole(file: string): number | null {
 await buildAllHashDatabases();
 const romFiles = scanRomFolder("./ROMs");
 
-let supported = 0;
+let supportedGames = new Map<string, string>();
+let unsupportedGames = new Map<string, string>();
+
 let total = 0;
+let supported = 0;
+
+if (fs.existsSync("./cache/supported_games.json")) {
+    supportedGames = new Map(Object.entries(JSON.parse(fs.readFileSync("./cache/supported_games.json", "utf8"))));
+}
+
+if (fs.existsSync("./cache/unsupported_games.json")) {
+    unsupportedGames = new Map(Object.entries(JSON.parse(fs.readFileSync("./cache/unsupported_games.json", "utf8"))));
+}
 
 for (const file of romFiles) {
     const folder = path
@@ -213,19 +238,21 @@ for (const file of romFiles) {
         continue;
     }
 
-    let hash;
-    
-    try {
-        if (ext === ".rvz") {
-            hash = await hashRvz(consoleId, file);
-        } else {
-            hash = await raHash(consoleId, file);
-        }
-    } catch (err) {
-        if (err instanceof Error) {
-            console.log(
-                `❌ ${folder.padEnd(8)} ${path.basename(file)} -> ${err.message}`,
-            );
+    let hash = supportedGames.has(file) ? supportedGames.get(file) : unsupportedGames.has(file) ? unsupportedGames.get(file) : null;
+
+    if (!hash) {
+        try {
+            if (ext === ".rvz") {
+                hash = await hashRvz(consoleId, file);
+            } else {
+                hash = await raHash(consoleId, file);
+            }
+        } catch (err) {
+            if (err instanceof Error) {
+                console.log(
+                    `❌ ${folder.padEnd(8)} ${path.basename(file)} -> ${err.message}`,
+                );
+            }
         }
     }
 
@@ -235,7 +262,12 @@ for (const file of romFiles) {
 
     const game = globalHashMap.get(hash);
 
-    if (game) supported++;
+    if (game) {
+        supported++;
+        supportedGames.set(file, hash);
+    } else {
+        unsupportedGames.set(file, hash);
+    }
 
     console.log(
         `${game ? "✅" : "❌"} ${folder.padEnd(8)} ${path.basename(file)} -> ${game?.Title ?? "Not supported"}`,
@@ -243,3 +275,9 @@ for (const file of romFiles) {
 }
 
 console.log(`Supported: ${supported} / ${total}`);
+
+fs.writeFileSync("./cache/supported_games.json", JSON.stringify(Object.fromEntries(supportedGames), null, 2));
+fs.writeFileSync("./cache/unsupported_games.json", JSON.stringify(Object.fromEntries(unsupportedGames), null, 2));
+
+fs.writeFileSync("supported_games.txt", Array.from(supportedGames.keys()).join("\n"));
+fs.writeFileSync("unsupported_games.txt", Array.from(unsupportedGames.keys()).join("\n"));
