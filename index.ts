@@ -264,11 +264,14 @@ cleanCache(supportedGames);
 cleanCache(unsupportedGames);
 cleanHashIndex(hashIndex);
 
-for (const file of romFiles) {
+for (let i = 0; i < romFiles.length; i++) {
+    const file = romFiles[i];
     const relative = getRelative(file);
     const parts = relative.split("/");
     const folder = parts.length > 1 ? parts[0].toUpperCase() : "";
     const ext = path.extname(file).toLowerCase();
+
+    const progress = `[${i + 1}/${romFiles.length}]`;
 
     const consoleId = detectConsole(file);
 
@@ -324,7 +327,7 @@ for (const file of romFiles) {
     }
 
     console.log(
-        `${game ? "✅" : "❌"} ${folder.padEnd(8)} ${path.basename(file)} -> ${game?.Title ?? "Not supported"}`,
+        `${progress} ${game ? "✅" : "❌"} ${folder.padEnd(8)} ${path.basename(file)} -> ${game?.Title ?? "Not supported"}`,
     );
 }
 
