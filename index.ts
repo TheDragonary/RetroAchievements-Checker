@@ -196,12 +196,34 @@ function scanRomFolder(dir: string): string[] {
 
 function detectConsole(file: string): number | null {
     const relative = getRelative(file);
-    const folder = relative.split("/")[0].toUpperCase();
+    const parts = relative.split("/");
+    const folder = parts.length > 1 ? parts[0].toUpperCase() : "";
 
     if (consoleMap[folder]) return consoleMap[folder];
     const ext = path.extname(file).toLowerCase();
     if (extensionMap[ext]) return extensionMap[ext];
     return null;
+}
+
+function cleanCache(cache: Map<string, string>) {
+    for (const [relative] of cache) {
+        const fullPath = path.join(romFolder, relative);
+        if (!fs.existsSync(fullPath)) cache.delete(relative);
+    }
+}
+
+function cleanHashIndex(index: Map<string, string[]>) {
+    for (const [hash, paths] of index) {
+        const valid = paths.filter(p =>
+            fs.existsSync(path.join(romFolder, p))
+        );
+
+        if (valid.length === 0) {
+            index.delete(hash);
+        } else {
+            index.set(hash, valid);
+        }
+    }
 }
 
 function resolveUserPath(p: string) {
@@ -220,6 +242,8 @@ const romFiles = scanRomFolder(romFolder);
 
 let supportedGames = new Map<string, string>();
 let unsupportedGames = new Map<string, string>();
+let duplicateGames = new Map<string, string>();
+let hashIndex = new Map<string, string[]>();
 
 let total = 0;
 let supported = 0;
@@ -232,9 +256,18 @@ if (fs.existsSync("./cache/unsupported_games.json")) {
     unsupportedGames = new Map(Object.entries(JSON.parse(fs.readFileSync("./cache/unsupported_games.json", "utf8"))));
 }
 
+if (fs.existsSync("./cache/hash_index.json")) {
+    hashIndex = new Map(Object.entries(JSON.parse(fs.readFileSync("./cache/hash_index.json", "utf8"))) as [string, string[]][]);
+}
+
+cleanCache(supportedGames);
+cleanCache(unsupportedGames);
+cleanHashIndex(hashIndex);
+
 for (const file of romFiles) {
     const relative = getRelative(file);
-    const folder = relative.split("/")[0].toUpperCase();
+    const parts = relative.split("/");
+    const folder = parts.length > 1 ? parts[0].toUpperCase() : "";
     const ext = path.extname(file).toLowerCase();
 
     const consoleId = detectConsole(file);
@@ -245,6 +278,7 @@ for (const file of romFiles) {
     }
 
     let hash = supportedGames.get(relative) ?? unsupportedGames.get(relative) ?? null;
+    if (hash && !globalHashMap.has(hash)) hash = null;
 
     if (!hash) {
         try {
@@ -268,6 +302,20 @@ for (const file of romFiles) {
 
     const game = globalHashMap.get(hash);
 
+    if (!hashIndex.has(hash)) hashIndex.set(hash, []);
+    
+    const list = hashIndex.get(hash)!;
+    if (!list.includes(relative)) list.push(relative);
+
+    if (list.length > 1) {
+        console.log("Duplicate ROM detected:");
+        console.log(list.join("\n"));
+
+        for (const p of list) {
+            duplicateGames.set(p, hash);
+        }
+    }
+
     if (game) {
         supported++;
         supportedGames.set(relative, hash);
@@ -284,6 +332,15 @@ console.log(`Supported: ${supported} / ${total}`);
 
 fs.writeFileSync("./cache/supported_games.json", JSON.stringify(Object.fromEntries(supportedGames), null, 2));
 fs.writeFileSync("./cache/unsupported_games.json", JSON.stringify(Object.fromEntries(unsupportedGames), null, 2));
+fs.writeFileSync("./cache/hash_index.json", JSON.stringify(Object.fromEntries(hashIndex), null, 2));
 
 fs.writeFileSync("supported_games.txt", Array.from(supportedGames.keys()).join("\n"));
 fs.writeFileSync("unsupported_games.txt", Array.from(unsupportedGames.keys()).join("\n"));
+
+if (duplicateGames.size > 0) {
+    fs.writeFileSync("./cache/duplicate_games.json", JSON.stringify(Object.fromEntries(duplicateGames), null, 2));
+    fs.writeFileSync("duplicate_games.txt", Array.from(duplicateGames.keys()).join("\n"));
+} else if (fs.existsSync("./cache/duplicate_games.json")) {
+    fs.unlinkSync("./cache/duplicate_games.json");
+    fs.unlinkSync("duplicate_games.txt");
+}
