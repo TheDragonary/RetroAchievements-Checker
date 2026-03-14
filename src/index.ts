@@ -1,16 +1,16 @@
-import dolphinTool, { DigestAlgorithm } from "dolphin-tool";
 import { execFile } from "child_process";
-import { promisify } from "util";
+import dolphinTool, { DigestAlgorithm } from "dolphin-tool";
 import envPaths from "env-paths";
-import path from "path";
 import fs from "fs";
-import type { Console, Game } from "./types.js";
+import path from "path";
+import { promisify } from "util";
 import { allowedExtensions, detectSystemFromExtension, detectSystemFromFolder } from "./systems.js";
+import type { Console, Game } from "./types.js";
 
 export async function runScanner(romFolder: string, apiKey?: string) {
     const paths = envPaths("ra-scan");
 
-    const APP_DIR = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../"); 
+    const APP_DIR = process.execPath.includes("ra-scan") ? path.dirname(process.execPath) : process.cwd();
     const CACHE_DIR = paths.cache;
 
     if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
@@ -41,6 +41,13 @@ export async function runScanner(romFolder: string, apiKey?: string) {
         throw new Error(`RAHasher binary not found at ${HASHER}`);
     }
 
+    function setupBinary() {
+        if (process.platform === "win32") {
+            const binDir = path.join(process.cwd(), "bin");
+            process.env.PATH = `${binDir};${process.env.PATH}`;
+        }
+    }
+
     async function raHash(consoleId: number, file: string): Promise<string> {
         const { stdout } = await execFileAsync(HASHER, [
             consoleId.toString(),
@@ -51,6 +58,7 @@ export async function runScanner(romFolder: string, apiKey?: string) {
     }
 
     async function hashRvz(file: string): Promise<string> {
+        setupBinary();
         const hash = await dolphinTool.verify({
             inputFilename: file,
             digestAlgorithm: DigestAlgorithm.RCHASH

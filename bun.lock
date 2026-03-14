@@ -1,0 +1,55 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "ra-scan",
+      "dependencies": {
+        "commander": "^14.0.3",
+        "dolphin-tool": "^0.2512.1",
+        "env-paths": "^4.0.0",
+      },
+      "devDependencies": {
+        "@types/node": "^25.5.0",
+        "typescript": "^5.9.3",
+      },
+    },
+  },
+  "packages": {
+    "@emmercm/dolphin-tool-darwin-arm64": ["@emmercm/dolphin-tool-darwin-arm64@0.2512.1", "", { "os": "darwin", "cpu": "arm64" }, "sha512-h32KH13duI3cj76qfMceJl345O3nwZHh9zt3QsBQjHzlSQvIzXO5yolNgFM4HIntpvLiZ64mZ63nthFd5lB+RA=="],
+
+    "@emmercm/dolphin-tool-darwin-x64": ["@emmercm/dolphin-tool-darwin-x64@0.2512.1", "", { "os": "darwin", "cpu": "x64" }, "sha512-Gmt9chhmrAyCyIPggP5x5y0MsiLRgGm6cTi6vlb2Z///7PSBH/HDR7Eci9vhdZ1z/IrTNpwtXboC5Cs6mu8TcQ=="],
+
+    "@emmercm/dolphin-tool-linux-arm": ["@emmercm/dolphin-tool-linux-arm@0.2512.1", "", { "os": "linux", "cpu": "arm" }, "sha512-Ln345JuGBjjONSMsBOe5YJbrxqoWxEp7nul5j9xvDrBDJk/daAZg+28J9+/U7z4S3Y2OG0/vEo19Pbh3q1R6Yg=="],
+
+    "@emmercm/dolphin-tool-linux-arm64": ["@emmercm/dolphin-tool-linux-arm64@0.2512.1", "", { "os": "linux", "cpu": "arm64" }, "sha512-pP57GKq1MxCtyfad3BT4hQVylYbmmuBv5/piuUOfdkZQBKDW2krLzNBILxkX8LnhQJ5NEQF9Tcq5OeUzAyu6ag=="],
+
+    "@emmercm/dolphin-tool-linux-x64": ["@emmercm/dolphin-tool-linux-x64@0.2512.1", "", { "os": "linux", "cpu": "x64" }, "sha512-UKWvhBnKEncUeHm+fn7tQmqWdyAGeBl2PHuM6UhadBIv7dJ+0dQacCPk/86aAutAtdmo1DyeqMFeskIjT8kX6Q=="],
+
+    "@emmercm/dolphin-tool-win32-arm64": ["@emmercm/dolphin-tool-win32-arm64@0.2512.1", "", { "os": "win32", "cpu": "arm64" }, "sha512-SoUNgPIYMyHR4SbqeO1enEPxTvwr3gI5+dbcE9+y716JymJbPhkvlXMfskayQH+5Rj8Fgb7kqSJzTRbDekyB5Q=="],
+
+    "@emmercm/dolphin-tool-win32-x64": ["@emmercm/dolphin-tool-win32-x64@0.2512.1", "", { "os": "win32", "cpu": "x64" }, "sha512-yRQdyD8Y9bLhNUxP7US/yfDHB6yQ5/BVJRm0xixjo9Fg0p6NAidAAnTs1B4QKgMpx/l7gUvsbmyLfxLac4a6lQ=="],
+
+    "@types/node": ["@types/node@25.5.0", "", { "dependencies": { "undici-types": "~7.18.0" } }, "sha512-jp2P3tQMSxWugkCUKLRPVUpGaL5MVFwF8RDuSRztfwgN1wmqJeMSbKlnEtQqU8UrhTmzEmZdu2I6v2dpp7XIxw=="],
+
+    "async-mutex": ["async-mutex@0.5.0", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-1A94B18jkJ3DYq284ohPxoXbfTA5HsQ7/Mf4DEhcyLx3Bz27Rh59iScbB6EPiP+B+joue6YCxcMXSbFC1tZKwA=="],
+
+    "commander": ["commander@14.0.3", "", {}, "sha512-H+y0Jo/T1RZ9qPP4Eh1pkcQcLRglraJaSLoyOtHxu6AapkjWVCy2Sit1QQ4x3Dng8qDlSsZEet7g5Pq06MvTgw=="],
+
+    "dolphin-tool": ["dolphin-tool@0.2512.1", "", { "dependencies": { "async-mutex": "^0.5.0", "which": "^6.0.1" }, "optionalDependencies": { "@emmercm/dolphin-tool-darwin-arm64": "^0.2512.1", "@emmercm/dolphin-tool-darwin-x64": "^0.2512.1", "@emmercm/dolphin-tool-linux-arm": "^0.2512.1", "@emmercm/dolphin-tool-linux-arm64": "^0.2512.1", "@emmercm/dolphin-tool-linux-x64": "^0.2512.1", "@emmercm/dolphin-tool-win32-arm64": "^0.2512.1", "@emmercm/dolphin-tool-win32-x64": "^0.2512.1" }, "bin": { "dolphin-tool": "dist/src/bin.js" } }, "sha512-6LRxzdFpPf15U+gg7geKcSyP9Jog3dTEdyGd5uCApHH7o2Bxb3CyMqLU4i8G51inVaHkP2gS+3rfTiuA+ORHnA=="],
+
+    "env-paths": ["env-paths@4.0.0", "", { "dependencies": { "is-safe-filename": "^0.1.0" } }, "sha512-pxP8eL2SwwaTRi/KHYwLYXinDs7gL3jxFcBYmEdYfZmZXbaVDvdppd0XBU8qVz03rDfKZMXg1omHCbsJjZrMsw=="],
+
+    "is-safe-filename": ["is-safe-filename@0.1.1", "", {}, "sha512-4SrR7AdnY11LHfDKTZY1u6Ga3RuxZdl3YKWWShO5iyuG5h8QS4GD2tOb04peBJ5I7pXbR+CGBNEhTcwK+FzN3g=="],
+
+    "isexe": ["isexe@4.0.0", "", {}, "sha512-FFUtZMpoZ8RqHS3XeXEmHWLA4thH+ZxCv2lOiPIn1Xc7CxrqhWzNSDzD+/chS/zbYezmiwWLdQC09JdQKmthOw=="],
+
+    "tslib": ["tslib@2.8.1", "", {}, "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="],
+
+    "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
+
+    "undici-types": ["undici-types@7.18.2", "", {}, "sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w=="],
+
+    "which": ["which@6.0.1", "", { "dependencies": { "isexe": "^4.0.0" }, "bin": { "node-which": "bin/which.js" } }, "sha512-oGLe46MIrCRqX7ytPUf66EAYvdeMIZYn3WaocqqKZAxrBpkqHfL/qvTyJ/bTk5+AqHCjXmrv3CEWgy368zhRUg=="],
+  }
+}

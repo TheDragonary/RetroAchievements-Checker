@@ -1,7 +1,5 @@
 node_modules
 .env
-ROMs
 dist
-cache
+build
 *.txt
-ra-scan*

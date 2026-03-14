@@ -38,6 +38,11 @@ Clear cache and rescan:
 ra-scan -k YOUR_API_KEY -c ./ROMs/
 ```
 
+Windows:
+```pwsh
+.\ra-scan.exe -k YOUR_API_KEY ./ROMs/
+```
+
 ## Features
 
 - Scans a ROM library and detects supported RetroAchievements games

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
+import "dolphin-tool";
 import envPaths from "env-paths";
 import fs from "fs";
-import "dolphin-tool";
 import { runScanner } from "./index.js";
 
 const program = new Command();
@@ -12,7 +12,7 @@ const paths = envPaths("ra-scan");
 program
     .name("ra-scan")
     .description("Scan ROM folders for RetroAchievements compatibility")
-    .version("1.1.2")
+    .version("0.1.0")
     .argument("<roms>", "ROM folder to scan")
     .option("-k, --api-key <key>", "RetroAchievements API key")
     .option("-c, --clear-cache", "clear cache before scanning")

@@ -1,6 +1,6 @@
 {
   "name": "ra-scan",
-  "version": "1.1.2",
+  "version": "0.1.0",
   "description": "Scan your ROM library and identify which games support RetroAchievements",
   "license": "GPL-3.0-only",
   "repository": {
@@ -21,13 +21,9 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/cli.js",
-    "prepublishOnly": "npm run build",
-    "build:linux": "npm run build && bun build dist/cli.js --compile --target=bun-linux-x64 --outfile ra-scan",
-    "build:windows": "npm run build && bun build dist/cli.js --compile --target=bun-windows-x64 --outfile ra-scan",
-    "build:macos": "npm run build && bun build dist/cli.js --compile --target=bun-darwin-x64 --outfile ra-scan",
-    "build:linux-arm": "npm run build && bun build dist/cli.js --compile --target=bun-linux-arm64 --outfile ra-scan",
-    "build:windows-arm": "npm run build && bun build dist/cli.js --compile --target=bun-windows-arm64 --outfile ra-scan",
-    "build:macos-arm": "npm run build && bun build dist/cli.js --compile --target=bun-darwin-arm64 --outfile ra-scan"
+    "prepublishOnly": "bun run build",
+    "build:linux": "bun run build && bun build dist/cli.js --compile --target=bun-linux-x64 --outfile build/ra-scan-linux-x64/ra-scan",
+    "build:windows": "bun run build && bun build dist/cli.js --compile --target=bun-windows-x64 --outfile build/ra-scan-windows-x64/ra-scan"
   },
   "dependencies": {
     "commander": "^14.0.3",
@@ -35,8 +31,8 @@
     "env-paths": "^4.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.9.3",
-    "@types/node": "^25.5.0"
+    "@types/node": "^25.5.0",
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=20"
@@ -47,6 +43,9 @@
     "rom",
     "emulation",
     "scanner",
-    "cli"
+    "cli",
+    "retro",
+    "games",
+    "game"
   ]
 }
