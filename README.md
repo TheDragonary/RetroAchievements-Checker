@@ -92,27 +92,7 @@ Example output:
 
 ## Getting Started
 
-### Run with npx
-
-Make sure Node.js is installed on your system, then run the script using `npx`.
-
-```bash
-npx ra-scan ROMs/ -k YOUR_API_KEY
-```
-
-### Install with Node.js
-
 Make sure Node.js is installed on your system.
-
-Clone the repo
-```bash
-git clone https://github.com/TheDragonary/RetroAchievements-ROM-Scanner.git
-```
-
-Install dependencies
-```bash
-npm install
-```
 
 Place your ROMs inside a folder. Folder names should match the entries in `consoleMap`. Example structure:
 ```bash
@@ -129,7 +109,25 @@ ROMs/
         Final Fantasy VII (USA) (Disc 1).chd
 ```
 
-Run the script. Make sure to specify the path to your ROMs folder and supply your RetroAchievements API key. Subsequent runs don't require an API key as all data is stored in cache.
+### Run with npx
+
+```bash
+npx ra-scan ROMs/ -k YOUR_API_KEY
+```
+
+### Install with Node.js
+
+Clone the repo
+```bash
+git clone https://github.com/TheDragonary/RetroAchievements-ROM-Scanner.git
+```
+
+Install dependencies
+```bash
+npm install
+```
+
+Run the script
 ```bash
 npm run start -- ROMs/ --api-key YOUR_API_KEY
 ```

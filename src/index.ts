@@ -10,7 +10,7 @@ import type { Console, Game } from "./types.js";
 export async function runScanner(romFolder: string, apiKey?: string) {
     const paths = envPaths("ra-scan");
 
-    const APP_DIR = process.execPath.includes("ra-scan") ? path.dirname(process.execPath) : process.cwd();
+    const APP_DIR = getAppDir();
     const CACHE_DIR = paths.cache;
 
     if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
@@ -39,6 +39,13 @@ export async function runScanner(romFolder: string, apiKey?: string) {
 
     if (!fs.existsSync(HASHER)) {
         throw new Error(`RAHasher binary not found at ${HASHER}`);
+    }
+
+    function getAppDir(): string {
+        if (process.execPath.endsWith("ra-scan") || process.execPath.endsWith("ra-scan.exe")) {
+            return path.dirname(process.execPath);
+        }
+        return path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
     }
 
     function setupBinary() {
@@ -186,7 +193,7 @@ export async function runScanner(romFolder: string, apiKey?: string) {
         supportedGames: Map<string, string>,
         unsupportedGames: Map<string, string>,
         globalHashMap: Map<string, Game>
-    ) {
+    ): Map<string, string> {
         const duplicateGames = new Map<string, string>();
         let duplicateGroups = 0;
         let duplicateFiles = 0;
