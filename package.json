@@ -1,6 +1,6 @@
 {
   "name": "ra-scan",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "Scan your ROM library and identify which games support RetroAchievements",
   "license": "GPL-3.0-only",
   "repository": {
@@ -16,7 +16,8 @@
     "ra-scan": "dist/cli.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "bin"
   ],
   "scripts": {
     "build": "tsc",

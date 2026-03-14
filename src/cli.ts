@@ -12,7 +12,7 @@ const paths = envPaths("ra-scan");
 program
     .name("ra-scan")
     .description("Scan ROM folders for RetroAchievements compatibility")
-    .version("0.1.0")
+    .version("0.1.4")
     .argument("<roms>", "ROM folder to scan")
     .option("-k, --api-key <key>", "RetroAchievements API key")
     .option("-c, --clear-cache", "clear cache before scanning")
