@@ -108,7 +108,9 @@ export async function runScanner(romFolder: string, apiKey?: string) {
         }
 
         for (const c of consoles) {
-            console.log(`Loading ${c.Name}...`);
+            process.stdout.write(`Loading ${c.Name}...`);
+            process.stdout.clearLine(0);
+            process.stdout.cursorTo(0);
             
             let games: Game[];
             if (!fs.existsSync(path.join(CACHE_DIR, `${c.ID}.json`))) {
