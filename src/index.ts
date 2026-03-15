@@ -159,6 +159,9 @@ export async function runScanner(romFolder: string, apiKey?: string) {
             if (system) return system;
         }
 
+        const system = detectSystemFromFolder(path.basename(romFolder));
+        if (system) return system;
+
         const ext = path.extname(file).toLowerCase();
         const possible = detectSystemFromExtension(ext);
 
@@ -270,7 +273,7 @@ export async function runScanner(romFolder: string, apiKey?: string) {
         if (!file) continue;
         const relative = getRelative(file);
         const parts = relative.split("/");
-        const folder = parts.length > 1 ? parts[0] ? parts[0].toUpperCase() : "" : "";
+        const folder = parts.length > 1 ? parts[0]!.toUpperCase() : detectSystemFromFolder(path.basename(romFolder)) ? path.basename(romFolder).toUpperCase() : "";
         const ext = path.extname(file).toLowerCase();
 
         const progress = `[${i + 1}/${romFiles.length}]`;
@@ -287,6 +290,7 @@ export async function runScanner(romFolder: string, apiKey?: string) {
 
         if (!hash) {
             try {
+                process.stdout.write(`${progress} 🔄 ${folder.padEnd(8)} ${path.basename(file)} -> Hashing...`);
                 if (ext === ".rvz") {
                     hash = await hashRvz(file);
                 } else {
@@ -294,9 +298,9 @@ export async function runScanner(romFolder: string, apiKey?: string) {
                 }
             } catch (err) {
                 if (err instanceof Error) {
-                    console.log(
-                        `${progress} ❌ ${folder.padEnd(8)} ${path.basename(file)} -> ${err.message}`,
-                    );
+                    process.stdout.clearLine(0);
+                    process.stdout.cursorTo(0);
+                    console.log(`${progress} ❌ ${folder.padEnd(8)} ${path.basename(file)} -> ${err.message}`);
                 }
             }
         }
@@ -314,6 +318,8 @@ export async function runScanner(romFolder: string, apiKey?: string) {
         if (game) supportedGames.set(relative, hash);
         else unsupportedGames.set(relative, hash);
 
+        process.stdout.clearLine(0);
+        process.stdout.cursorTo(0);
         console.log(`${progress} ${game ? "✅" : "❌"} ${folder.padEnd(8)} ${path.basename(file)} -> ${game?.Title ?? "Not supported"}`);
     }
 
